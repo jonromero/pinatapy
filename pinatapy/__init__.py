@@ -75,6 +75,27 @@ class PinataPy:
 
         return self.__error(res)
 
+    # It is easier to pin a 'filestream' because sometimes the data are in a database or are served from serverless
+    # with no access to the hd
+    def pin_filestream_to_ipfs(self, filestream, options=None):
+        url_suffix = "pinning/pinFileToIPFS"
+        files = {
+                    "file": filestream
+                    }
+
+        if options is not None:
+            if "pinataMetadata" in options:
+                files["pinataMetadata"] = options["pinataMetadata"]
+            if "pinataOptions" in options:
+                files["pinataOptions"] = options["pinataOptions"]
+
+        res = requests.post(self.__endpoint + url_suffix, files=files, headers=self.headers)
+
+        if  res.status_code == 200:
+            return res.json()
+
+        return self.__error(res)
+    
     # TODO
     # path_to_file may be a path to a directory. In this case pin_file_to_ipfs must pin files recursively
     def pin_file_to_ipfs(self, path_to_file, options=None):
